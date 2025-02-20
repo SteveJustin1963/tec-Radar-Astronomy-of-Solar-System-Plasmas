@@ -100,4 +100,96 @@ JMP LOOP
 ---
 
 ## **Conclusion**
-This DIY project enables real-time monitoring of **solar wind effects on Earth's ionosphere** using simple radio equipment and the **TEC-1 SBC**. By capturing VLF signal variations, we can **detect space weather events** and gain insights into solar activity—**all from home!** 🚀📡
+This DIY project enables real-time monitoring of **solar wind effects on Earth's ionosphere** using simple radio equipment and the **TEC-1 SBC**. By capturing VLF signal variations, we can **detect space weather events** and gain insights into solar activity—**all from home!** 
+
+
+# Mathematical Formulas
+The Radar Astronomy of Solar System Plasmas 19650001544.PDF  contains relevant mathematical formulas that can be applied to your DIY **solar wind detection** project using the **TEC-1 SBC and a VLF receiver**. Here’s how the key equations from the paper relate to your setup:
+
+---
+
+### **1. Doppler Excess Frequency & Electron Density Changes**
+- The document provides this equation for detecting changes in electron density using radio waves:
+
+![image](https://github.com/user-attachments/assets/becc33e8-c2bc-4192-b1dd-ede236a688f0)
+
+\[
+f_{DE} = \frac{c^2 r_e}{2} \frac{dI}{dt}
+\]
+
+where:
+- \( f_{DE} \) = Doppler excess frequency (Hz)
+- \( c \) = speed of light (~\( 3 \times 10^8 \) m/s)
+- \( r_e \) = classical electron radius (~\( 2.8178 \times 10^{-15} \) m)
+- \( I \) = columnar electron density (electrons/m²)
+- \( \frac{dI}{dt} \) = rate of change of electron density
+
+🔹 **How to use it in your DIY lab**:
+- Your VLF signal undergoes **phase shifts** when solar wind alters the ionosphere’s electron density.
+- The **TEC-1 SBC can measure** frequency variations in your VLF signal over time.
+- **Comparing recorded \( f_{DE} \) changes with space weather data** can reveal **solar wind disturbances**.
+
+---
+
+### **2. Signal Path Delay Due to Electron Density**
+The paper states that a wave traveling through a plasma slows down according to:
+
+![image](https://github.com/user-attachments/assets/3ca168d7-7d99-46dd-8fa5-f100e4cf9a0c)
+
+\[
+R = \frac{c^2 r_e}{2} I
+\]
+
+where:
+- \( R \) = additional path delay (meters)
+- \( I \) = integrated electron density (electrons/m²)
+
+🔹 **Application to Your Setup**:
+- If the **VLF signal takes longer to arrive** at your receiver, it suggests an **increase in electron density** in the ionosphere due to solar wind.
+- **TEC-1 can log timestamps** of signal changes and compute **ionospheric fluctuations**.
+
+---
+
+### **3. Refraction & Bending of Radio Waves**
+For transverse electron density gradients, the wave path bends:
+
+![image](https://github.com/user-attachments/assets/e1d9acad-ffb6-499a-adb0-0e924d7a0167)
+
+\[
+\Delta \theta = \frac{c^2 r_e}{2 f^2} \frac{dI}{dx}
+\]
+
+where:
+- \( \Delta \theta \) = change in wave direction (radians)
+- \( f \) = VLF signal frequency (Hz)
+- \( \frac{dI}{dx} \) = electron density gradient
+
+🔹 **How This Applies**:
+- Sudden **signal fades or fluctuations** in your VLF reception could indicate **ionospheric bending**.
+- By **tracking signal strength variations with TEC-1**, you might detect solar wind-driven ionospheric turbulence.
+
+---
+
+### **4. Faraday Rotation (Polarization Change)**
+If you add a **polarized antenna**, you could measure **Faraday rotation**:
+
+![image](https://github.com/user-attachments/assets/ab356ad2-b71f-4393-87f9-807cf7a26cb4)
+
+\[
+\phi = \frac{2 c r_e}{f^2} \int_{path} N_e B \, ds
+\]
+
+where:
+- \( \phi \) = rotation angle (radians)
+- \( B \) = Earth’s magnetic field strength
+- \( N_e \) = electron density
+
+🔹 **Why This Matters**:
+- This could be an **advanced experiment** where you measure **VLF signal polarization shifts** to infer **magnetic field interactions with solar wind**.
+- **DIY challenge**: Use a **circularly polarized loop antenna** and detect **small changes in signal polarization** with TEC-1.
+
+---
+
+## **Conclusion**
+The **mathematics in the PDF** aligns well with our **DIY TEC-1 + VLF solar wind detection** project. The **Doppler shift, path delay, and signal bending** formulas can be used to **interpret real-time VLF data** logged by your Z80 system. 
+We could **derive simpler versions of these equations** for direct implementation in Z80 assembly.
