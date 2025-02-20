@@ -192,4 +192,4 @@ where:
 
 ## **Conclusion**
 The **mathematics in the PDF** aligns well with our **DIY TEC-1 + VLF solar wind detection** project. The **Doppler shift, path delay, and signal bending** formulas can be used to **interpret real-time VLF data** logged by your Z80 system. 
-We could **derive simpler versions of these equations** for direct implementation in Z80 assembly.
+We need the MPU AM9511 or we could **derive simpler versions of these equations** for direct implementation in Z80 assembly.
