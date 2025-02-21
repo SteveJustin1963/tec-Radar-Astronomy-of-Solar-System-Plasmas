@@ -1,4 +1,4 @@
-# tec-Radar-Astronomy-of-Solar-System-Plasmas RASP
+![image](https://github.com/user-attachments/assets/c7d25423-398a-4653-831b-e581cd0fa629)# tec-Radar-Astronomy-of-Solar-System-Plasmas RASP
 
 Catch the whispers of the Sun! Use simple radio gear to detect how the solar wind shapes Earth's ionosphere and space weather in real time
 
@@ -206,7 +206,8 @@ Here's what to measure and how to apply it to the formula:
 1. ![image](https://github.com/user-attachments/assets/ab735f98-1f4d-457e-8f91-90356abf16cd) **\( f_{VLF} \)** – **VLF carrier frequency** (e.g., 24 kHz from NAA).
 2. ![image](https://github.com/user-attachments/assets/87cc68b8-1b5b-4759-a345-d9416fb3b70e) **\( \Delta f \)** – **Frequency drift (Doppler shift) of the received VLF signal** in Hz.
 3. ![image](https://github.com/user-attachments/assets/96314b4a-d9e1-466e-91db-bb492a89b545) **\( \frac{dI}{dt} \)** – **Rate of change of column electron density (to be computed).**
-4. **\( c \) (Speed of Light)**  `c`    – Constant \( 3 \times 10^8 \) m/s.
+4. **\( c \) (Speed of Light)**  `c`    – Constant \( 3 \times 10^8 \) m/s. ![image](https://github.com/user-attachments/assets/04a75ea3-3a68-433b-b9c4-08b117408f55)
+
 5. ![image](https://github.com/user-attachments/assets/a80887f9-615b-4e94-aafa-cb614f37efeb) **\( r_e \) (Classical Electron Radius)** – Constant \( 2.8178 \times 10^{-15} \) m.
 
 ---
@@ -214,11 +215,15 @@ Here's what to measure and how to apply it to the formula:
 ### **2. Applying the Formula**
 The PDF gives the equation:
 
+![image](https://github.com/user-attachments/assets/bdb2cfe5-d9c4-4727-86cf-48c588705741)
+
 \[
 f_{DE} = \frac{c^2 r_e}{2} \frac{dI}{dt}
 \]
 
-Rearrange to solve for **\( dI/dt \) (electron density rate of change):**
+Rearrange to solve for **\( dI/dt \) ![image](https://github.com/user-attachments/assets/11264e33-baa6-464e-9348-db87c0f004e3) (electron density rate of change):**
+
+![image](https://github.com/user-attachments/assets/485e4a5e-6443-4801-9008-52a78fb8a680)
 
 \[
 \frac{dI}{dt} = \frac{2 f_{DE}}{c^2 r_e}
@@ -230,58 +235,75 @@ where:
 
 ---
 
-### **3. Steps to Measure & Calculate \( dI/dt \)**
-1. **Record the baseline VLF signal frequency \( f_{VLF} \).**
+### **3. Steps to Measure & Calculate \( dI/dt \)** ![image](https://github.com/user-attachments/assets/31f086c5-3dd0-457f-890d-a55693e5f52f)
+
+1. **Record the baseline VLF signal frequency \( f_{VLF} \).** ![image](https://github.com/user-attachments/assets/d0c5550f-1cf9-4eb1-b046-79190df88a73)
+
    - Example: **WWVB = 60 kHz**, **NAA = 24 kHz**, **DHO38 = 23.4 kHz**.
    - Use **TEC-1’s counter/timer circuit** to log frequency over time.
 
-2. **Measure the frequency shift \( \Delta f \) at different times.**
+2. **Measure the frequency shift \( \Delta f \) ![image](https://github.com/user-attachments/assets/49154b83-ffe2-44ab-8e31-f325db3270aa)
+ at different times.**
    - If the received VLF signal **drifts up/down**, this is the Doppler effect.
-   - Example: If the expected signal is **24.000 kHz** but fluctuates to **24.002 kHz**, then **\( \Delta f = 2 \) Hz**.
+   - Example: If the expected signal is **24.000 kHz** but fluctuates to **24.002 kHz**, then **\( \Delta f = 2 \) Hz**. ![image](https://github.com/user-attachments/assets/afcd3fb0-a26a-4118-a373-3757396c689d)
 
-3. **Compute \( f_{DE} \):**
-   - \( f_{DE} = \Delta f \) (assuming minimal movement between receiver and transmitter).
+
+3. **Compute \( f_{DE} \):** ![image](https://github.com/user-attachments/assets/40900ea9-6510-4d36-9bc2-ea5861a4d802)
+
+   - \( f_{DE} = \Delta f \) ![image](https://github.com/user-attachments/assets/6054f692-042c-4a80-bfaa-16c47996c2eb)
+(assuming minimal movement between receiver and transmitter).
 
 4. **Plug into the equation:**
    - Example:
-     - If \( f_{DE} = 2 \) Hz
+     - If \( f_{DE} = 2 \) Hz ![image](https://github.com/user-attachments/assets/7f51457a-9610-44c2-bf02-6bd9b828c635)
+
      - Then:
+![image](https://github.com/user-attachments/assets/5d0ad066-e7d9-4aaf-9d3f-2af814e79339)
 
        \[
        \frac{dI}{dt} = \frac{2 \times 2}{(3 \times 10^8)^2 \times 2.8178 \times 10^{-15}}
        \]
 
      - Approximate result:
+![image](https://github.com/user-attachments/assets/2e77bf09-b458-4a44-af30-2a50381b3289)
 
        \[
        dI/dt \approx 1.48 \times 10^{12} \text{ electrons/m²/s}
        \]
 
-     - Meaning: The **column electron density** in the ionosphere is changing at a rate of **\( 1.48 \times 10^{12} \) electrons per square meter per second** due to solar wind interaction.
+     - Meaning: The **column electron density** in the ionosphere is changing at a rate of 1.48 x 10^12 electrons per square meter per second due to solar wind interaction.
 
 ---
 
 ### **4. How TEC-1 Can Implement This**
 - Use **Z80 timer interrupts** to count **frequency changes per second**.
 - Store frequency readings in **TEC-1’s memory** at fixed time intervals.
-- Compute **\( f_{DE} \) by comparing consecutive readings**.
-- Calculate \( dI/dt \) using the formula in **integer math** (scaled for 16-bit precision).
+- Compute **\( f_{DE} \) ![image](https://github.com/user-attachments/assets/2b8662c8-50b7-4496-9b97-ce2827b3bc24)
+by comparing consecutive readings**.
+- Calculate \( dI/dt \) ![image](https://github.com/user-attachments/assets/18f063ac-53ce-4014-9806-1e8d8c8579d5)
+using the formula in **integer math** (scaled for 16-bit precision).
 - Display the **solar wind intensity estimate** in **scientific notation** or **LED bar format**.
 
 ---
 
 ### **5. Expected Observations**
 - **Stable signal** = Normal ionosphere.
-- **Slow drift in \( f_{DE} \)** = Natural ionospheric fluctuations.
-- **Sudden jump in \( f_{DE} \) (> 5 Hz over minutes)** = Possible **solar flare or CME (coronal mass ejection)** impact.
-- **Prolonged \( f_{DE} \) shift over hours** = Strong solar wind stream.
+- **Slow drift in \( f_{DE} \)** ![image](https://github.com/user-attachments/assets/9f79bbe3-1a32-4ced-815d-13ac43fd18ff)
+= Natural ionospheric fluctuations.
+- **Sudden jump in \( f_{DE} \) (> 5 Hz over minutes)** ![image](https://github.com/user-attachments/assets/83a3bbb9-2714-40c9-b2f0-4398123cc7d7)
+= Possible **solar flare or CME (coronal mass ejection)** impact.
+- **Prolonged \( f_{DE} \) shift over hours** ![image](https://github.com/user-attachments/assets/37bf0352-6404-454d-9925-ca615fcfc168)
+= Strong solar wind stream.
 
 ---
 
 ## **Conclusion**
 To detect solar wind, you **only need to measure**:
-1. **VLF frequency \( f_{VLF} \) over time.**
-2. **Frequency drift \( f_{DE} \).**
-3. **Apply the formula** to get **\( dI/dt \), the rate of ionospheric electron density change.**
+1. **VLF frequency \( f_{VLF} \) ![image](https://github.com/user-attachments/assets/06991ba6-fa7d-4b8e-839b-20eb8359c308)
+over time.**
+2. **Frequency drift \( f_{DE} \).** ![image](https://github.com/user-attachments/assets/2952aac6-1fe8-4cd1-9cbb-dc4adaa36c23)
+
+3. **Apply the formula** to get **\( dI/dt \), ![image](https://github.com/user-attachments/assets/3c6312ad-8bae-48a6-8385-07cf5b52eee8)
+the rate of ionospheric electron density change.**
 
 next we should make a **Z80 assembly routine** for measuring **VLF frequency shifts on TEC-1**
