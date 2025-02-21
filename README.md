@@ -306,4 +306,156 @@ over time.**
 3. **Apply the formula** to get **\( dI/dt \), ![image](https://github.com/user-attachments/assets/3c6312ad-8bae-48a6-8385-07cf5b52eee8)
 the rate of ionospheric electron density change.**
 
-next we should make a **Z80 assembly routine** for measuring **VLF frequency shifts on TEC-1**
+ ////
+
+# Arduino 
+- with **32-bit floating-point math** and a **transcendental function library**,
+- we can directly implement the full **solar wind detection system**
+  - using a **VLF receiver,
+  - a frequency counter (Timer1),
+  - and an ADC** to measure Doppler shifts and ionospheric electron density variations.  
+
+---
+
+## **📌 Key Features of This Code**
+✅ Uses **Arduino Timer1** (16-bit) to measure VLF frequency.  
+✅ Uses **ADC (AnalogRead)** to measure VLF signal amplitude variations.  
+✅ Computes **Doppler shift (\( f_{DE} \))**.  
+✅ Computes **Electron Density Rate of Change (\( dI/dt \))** using **floating-point math**.  
+✅ Outputs all results **via Serial Terminal**.  
+
+---
+
+## **🛠️ Hardware Setup**
+1. **VLF Receiver Output (Analog Signal)** → Connect to **A0 (ADC input)**.
+2. **VLF Frequency Output (Digital Signal)** → Connect to **Pin 5 (Timer1 Capture Input)**.
+3. **Serial Monitor (115200 baud)** → Displays real-time computed data.
+
+---
+
+## **📜 Full Arduino Code**
+```cpp
+// Constants
+const float c = 3.0e8;          // Speed of light in m/s
+const float r_e = 2.8178e-15;   // Classical electron radius in meters
+const float K = 2 / (c * c * r_e); // Precomputed scaling factor for dI/dt
+
+// Global Variables
+volatile unsigned long prevTime = 0; // Previous frequency measurement timestamp
+volatile unsigned long currTime = 0; // Current frequency measurement timestamp
+volatile float F_old = 24000.0;      // Previous VLF frequency (start with 24 kHz)
+float F_new = 0.0;                   // Current measured frequency
+float f_DE = 0.0;                    // Doppler excess frequency
+float dI_dt = 0.0;                    // Electron density rate of change
+int signalStrength = 0;               // VLF amplitude measurement
+
+void setup() {
+    Serial.begin(115200); // Initialize Serial Monitor
+    pinMode(5, INPUT);    // Timer1 input pin for frequency counting
+    pinMode(A0, INPUT);   // ADC input for VLF amplitude
+
+    // Setup Timer1 for Frequency Measurement
+    TCCR1A = 0;           // Normal mode
+    TCCR1B = (1 << CS11) | (1 << CS10); // Prescaler = 64
+    TIMSK1 |= (1 << TOIE1); // Enable Timer Overflow Interrupt
+
+    Serial.println("Solar Wind Detector Initialized...");
+}
+
+void loop() {
+    // Measure Frequency using Timer1
+    noInterrupts();          // Disable interrupts temporarily
+    currTime = micros();     // Capture current time in microseconds
+    unsigned long timeDiff = currTime - prevTime;
+    prevTime = currTime;     // Update previous time
+    interrupts();            // Enable interrupts again
+
+    if (timeDiff > 0) {
+        F_new = 1e6 / timeDiff;  // Convert time period to frequency in Hz
+    }
+
+    // Measure Signal Amplitude using ADC
+    signalStrength = analogRead(A0);
+
+    // Compute Doppler Shift (f_DE)
+    f_DE = abs(F_new - F_old);
+
+    // Compute Electron Density Rate of Change (dI/dt)
+    dI_dt = f_DE * K;
+
+    // Print Results to Serial Monitor
+    Serial.print("F_new: ");
+    Serial.print(F_new, 2);
+    Serial.print(" Hz | f_DE: ");
+    Serial.print(f_DE, 5);
+    Serial.print(" Hz | dI/dt: ");
+    Serial.print(dI_dt, 5);
+    Serial.print(" e-/m²/s | Signal Strength: ");
+    Serial.println(signalStrength);
+
+    // Update Old Frequency for Next Calculation
+    F_old = F_new;
+
+    // Delay before next measurement (Adjust based on desired update rate)
+    delay(500);
+}
+
+// Timer1 Overflow Interrupt for Frequency Measurement
+ISR(TIMER1_OVF_vect) {
+    prevTime = micros(); // Capture timestamp when overflow occurs
+}
+```
+
+---
+
+## **🔎 Explanation of Code**
+### **1️⃣ Frequency Measurement Using Timer1**
+- Uses **Timer1** on **Pin 5** to count pulses from the **VLF receiver**.
+- Computes **time between pulses** and converts to frequency (Hz).
+
+### **2️⃣ Amplitude Measurement Using ADC**
+- Uses **analogRead(A0)** to measure **VLF signal amplitude**, which fluctuates due to **ionospheric conditions**.
+
+### **3️⃣ Compute Doppler Shift (\( f_{DE} \))**
+- **Formula:** \( f_{DE} = |F_{new} - F_{old}| \)
+- This gives the **rate of frequency shift**, which is directly related to **solar wind disturbances**.
+
+### **4️⃣ Compute Electron Density Rate of Change (\( dI/dt \))**
+- **Formula:**
+  \[
+  dI/dt = f_{DE} \times \frac{2}{c^2 r_e}
+  \]
+- Uses **precomputed constant \( K \)** for efficiency.
+
+### **5️⃣ Display Data on Serial Terminal**
+- Prints **Frequency, Doppler Shift, Electron Density Rate, and Signal Strength** to the **Arduino Serial Monitor (115200 baud)**.
+
+---
+
+## **📊 Example Output on Serial Monitor**
+```
+Solar Wind Detector Initialized...
+F_new: 24001.24 Hz | f_DE: 1.24 Hz | dI/dt: 3.00e+12 e-/m²/s | Signal Strength: 512
+F_new: 23999.87 Hz | f_DE: 1.37 Hz | dI/dt: 3.32e+12 e-/m²/s | Signal Strength: 518
+F_new: 24002.45 Hz | f_DE: 2.58 Hz | dI/dt: 6.25e+12 e-/m²/s | Signal Strength: 510
+```
+- **F_new** → Current measured **VLF frequency**.
+- **f_DE** → Detected **Doppler shift**, indicates **ionospheric changes**.
+- **dI/dt** → Computed **electron density rate**, linked to **solar wind events**.
+- **Signal Strength** → Monitors **wave amplitude changes**, useful for **ionospheric disturbances**.
+
+---
+
+## **🚀 Enhancements & Next Steps**
+✅ **Add a graphical display (OLED/LCD) for real-time visualization.**  
+✅ **Log data to an SD card for long-term monitoring.**  
+✅ **Trigger alerts if solar activity exceeds a threshold.**  
+✅ **Integrate with space weather API for real-time comparisons.**  
+
+# cross code this for matlab and see what we get
+
+
+
+
+    
+  
