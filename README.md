@@ -557,7 +557,7 @@ grid on;
 - **Refine dummy data using real VLF recordings.**
 - **Compare results with real-time space weather reports.**
 -  **Implement machine learning anomaly detection for solar events.**
--  use **real-time MATLAB script** to **process actual VLF recordings from an SDR**? 🚀📡
+-  use **real-time MATLAB script** to **process actual VLF recordings from an SDR or VLF cct that was captured to a wav file**? 🚀📡
 
 ///
 
