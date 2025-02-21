@@ -193,3 +193,95 @@ where:
 ## **Conclusion**
 The **mathematics in the PDF** aligns well with our **DIY TEC-1 + VLF solar wind detection** project. The **Doppler shift, path delay, and signal bending** formulas can be used to **interpret real-time VLF data** logged by your Z80 system. 
 We need the MPU AM9511 or we could **derive simpler versions of these equations** for direct implementation in Z80 assembly.
+
+
+# **Point 1 (Doppler Excess Frequency & Electron Density Changes)**, 
+we need to measure **changes in VLF signal frequency over time** to compute **electron density variations** caused by the solar wind. 
+
+Here's what to measure and how to apply it to the formula:
+
+---
+
+### **1. What You Need to Measure**
+1. ![image](https://github.com/user-attachments/assets/ab735f98-1f4d-457e-8f91-90356abf16cd) **\( f_{VLF} \)** – **VLF carrier frequency** (e.g., 24 kHz from NAA).
+2. ![image](https://github.com/user-attachments/assets/87cc68b8-1b5b-4759-a345-d9416fb3b70e) **\( \Delta f \)** – **Frequency drift (Doppler shift) of the received VLF signal** in Hz.
+3. ![image](https://github.com/user-attachments/assets/96314b4a-d9e1-466e-91db-bb492a89b545) **\( \frac{dI}{dt} \)** – **Rate of change of column electron density (to be computed).**
+4. **\( c \) (Speed of Light)**  `c`    – Constant \( 3 \times 10^8 \) m/s.
+5. ![image](https://github.com/user-attachments/assets/a80887f9-615b-4e94-aafa-cb614f37efeb) **\( r_e \) (Classical Electron Radius)** – Constant \( 2.8178 \times 10^{-15} \) m.
+
+---
+
+### **2. Applying the Formula**
+The PDF gives the equation:
+
+\[
+f_{DE} = \frac{c^2 r_e}{2} \frac{dI}{dt}
+\]
+
+Rearrange to solve for **\( dI/dt \) (electron density rate of change):**
+
+\[
+\frac{dI}{dt} = \frac{2 f_{DE}}{c^2 r_e}
+\]
+
+where:
+- \( f_{DE} \) is the measured **Doppler excess frequency** (Hz).
+- \( dI/dt \) is the **rate of change of column electron density (electrons/m²/s).**
+
+---
+
+### **3. Steps to Measure & Calculate \( dI/dt \)**
+1. **Record the baseline VLF signal frequency \( f_{VLF} \).**
+   - Example: **WWVB = 60 kHz**, **NAA = 24 kHz**, **DHO38 = 23.4 kHz**.
+   - Use **TEC-1’s counter/timer circuit** to log frequency over time.
+
+2. **Measure the frequency shift \( \Delta f \) at different times.**
+   - If the received VLF signal **drifts up/down**, this is the Doppler effect.
+   - Example: If the expected signal is **24.000 kHz** but fluctuates to **24.002 kHz**, then **\( \Delta f = 2 \) Hz**.
+
+3. **Compute \( f_{DE} \):**
+   - \( f_{DE} = \Delta f \) (assuming minimal movement between receiver and transmitter).
+
+4. **Plug into the equation:**
+   - Example:
+     - If \( f_{DE} = 2 \) Hz
+     - Then:
+
+       \[
+       \frac{dI}{dt} = \frac{2 \times 2}{(3 \times 10^8)^2 \times 2.8178 \times 10^{-15}}
+       \]
+
+     - Approximate result:
+
+       \[
+       dI/dt \approx 1.48 \times 10^{12} \text{ electrons/m²/s}
+       \]
+
+     - Meaning: The **column electron density** in the ionosphere is changing at a rate of **\( 1.48 \times 10^{12} \) electrons per square meter per second** due to solar wind interaction.
+
+---
+
+### **4. How TEC-1 Can Implement This**
+- Use **Z80 timer interrupts** to count **frequency changes per second**.
+- Store frequency readings in **TEC-1’s memory** at fixed time intervals.
+- Compute **\( f_{DE} \) by comparing consecutive readings**.
+- Calculate \( dI/dt \) using the formula in **integer math** (scaled for 16-bit precision).
+- Display the **solar wind intensity estimate** in **scientific notation** or **LED bar format**.
+
+---
+
+### **5. Expected Observations**
+- **Stable signal** = Normal ionosphere.
+- **Slow drift in \( f_{DE} \)** = Natural ionospheric fluctuations.
+- **Sudden jump in \( f_{DE} \) (> 5 Hz over minutes)** = Possible **solar flare or CME (coronal mass ejection)** impact.
+- **Prolonged \( f_{DE} \) shift over hours** = Strong solar wind stream.
+
+---
+
+## **Conclusion**
+To detect solar wind, you **only need to measure**:
+1. **VLF frequency \( f_{VLF} \) over time.**
+2. **Frequency drift \( f_{DE} \).**
+3. **Apply the formula** to get **\( dI/dt \), the rate of ionospheric electron density change.**
+
+next we should make a **Z80 assembly routine** for measuring **VLF frequency shifts on TEC-1**
